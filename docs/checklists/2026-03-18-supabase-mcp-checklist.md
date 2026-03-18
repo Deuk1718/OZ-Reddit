@@ -1,0 +1,5 @@
+- [x] 현재 Codex MCP 설정과 Supabase 서버 등록 상태를 확인한다
+- [x] Codex 전역 설정에서 원격 MCP 클라이언트 필요 옵션을 반영한다
+- [x] Supabase MCP OAuth 로그인을 완료한다
+- [ ] MCP 리소스 조회로 연결 상태를 검증한다
+- [x] 설정 결과를 구현 문서에 기록한다
