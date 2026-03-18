@@ -3,12 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-type DeletePostButtonProps = {
-  postId: string
-  subredditName: string
+type DeleteCommentButtonProps = {
+  commentId: string
 }
 
-export function DeletePostButton({ postId, subredditName }: DeletePostButtonProps) {
+export function DeleteCommentButton({ commentId }: DeleteCommentButtonProps) {
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -17,19 +16,18 @@ export function DeletePostButton({ postId, subredditName }: DeletePostButtonProp
     setErrorMessage(null)
     setIsDeleting(true)
 
-    const response = await fetch(`/api/posts/${postId}`, {
+    const response = await fetch(`/api/comments/${commentId}`, {
       method: 'DELETE',
     })
 
+    const json = await response.json().catch(() => null)
     setIsDeleting(false)
 
     if (!response.ok) {
-      const json = await response.json().catch(() => null)
-      setErrorMessage(json?.message ?? '게시글 삭제 중 오류가 발생했습니다.')
+      setErrorMessage(json?.message ?? '댓글 삭제 중 오류가 발생했습니다.')
       return
     }
 
-    router.push(`/r/${subredditName}`)
     router.refresh()
   }
 
@@ -39,7 +37,7 @@ export function DeletePostButton({ postId, subredditName }: DeletePostButtonProp
         type='button'
         disabled={isDeleting}
         onClick={handleDelete}
-        className='rounded-full border border-danger/24 bg-danger/6 px-4 py-2 text-sm font-semibold text-danger transition hover:bg-danger hover:text-white disabled:cursor-not-allowed disabled:opacity-60'
+        className='text-sm font-semibold text-danger transition hover:text-danger disabled:cursor-not-allowed disabled:opacity-60'
       >
         {isDeleting ? '삭제 중...' : '삭제'}
       </button>

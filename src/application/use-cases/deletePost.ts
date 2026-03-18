@@ -1,5 +1,7 @@
 import type { PostRepository } from '@/application/repositories/PostRepository'
 
+import { isValidPostId } from '@/domain/rules/postRules'
+
 import {
   PostAuthorizationError,
   PostNotFoundError,
@@ -20,6 +22,10 @@ export async function deletePost(
 ): Promise<void> {
   if (!input.requesterId) {
     throw new PostAuthorizationError('게시글 삭제는 로그인 후 이용할 수 있습니다.')
+  }
+
+  if (!isValidPostId(input.postId)) {
+    throw new PostNotFoundError('게시글을 찾을 수 없습니다.')
   }
 
   const post = await dependencies.postRepository.findById(input.postId)

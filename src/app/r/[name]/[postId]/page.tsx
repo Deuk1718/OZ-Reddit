@@ -2,9 +2,13 @@ import Link from 'next/link'
 import { getServerSession } from 'next-auth'
 import { notFound } from 'next/navigation'
 
+import { getComments } from '@/application/use-cases/getComments'
 import { getPostById } from '@/application/use-cases/getPostById'
+import { CommentComposer } from '@/components/comments/CommentComposer'
+import { CommentThreadList } from '@/components/comments/CommentThreadList'
 import { DeletePostButton } from '@/components/feed/DeletePostButton'
 import { authOptions } from '@/infrastructure/auth/authOptions'
+import { PrismaCommentRepository } from '@/infrastructure/db/repositories/PrismaCommentRepository'
 import { PrismaPostRepository } from '@/infrastructure/db/repositories/PrismaPostRepository'
 import { formatRelativeTime } from '@/lib/formatRelativeTime'
 
@@ -15,24 +19,20 @@ type PostDetailPageProps = {
   }>
 }
 
-const commentPlaceholders = [
-  {
-    author: 'threadreader',
-    createdAt: '32분 전',
-    body: '좋은 피드는 결국 제목과 메타의 우선순위를 먼저 정리해두는 게 핵심이라는 점에 공감합니다. 특히 댓글 수와 점수가 어디서 읽히는지가 중요해 보여요.',
-  },
-  {
-    author: 'uxfield',
-    createdAt: '17분 전',
-    body: '카드에 정보가 많아도 시선이 흐트러지지 않으려면 간격과 계층이 먼저라는 점이 실제 구현에서 큰 차이를 만드는 것 같습니다.',
-  },
-]
-
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
   const { name, postId } = await params
   const session = await getServerSession(authOptions)
   const postRepository = new PrismaPostRepository()
+  const commentRepository = new PrismaCommentRepository()
   const post = await getPostById(postId, { postRepository }).catch(() => null)
+  const comments = post
+    ? await getComments(
+        {
+          postId: post.id,
+        },
+        { commentRepository, postRepository }
+      ).catch(() => [])
+    : []
 
   if (!post || post.subredditName !== name) {
     notFound()
@@ -96,12 +96,12 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
               </p>
 
               <div className='mt-8 flex flex-wrap gap-3'>
-                <button
-                  type='button'
+                <a
+                  href='#comment-preview'
                   className='rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.22)] transition hover:bg-accent-strong'
                 >
-                  댓글 작성
-                </button>
+                  댓글 영역 보기
+                </a>
                 <button
                   type='button'
                   className='rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-deep transition hover:border-accent hover:text-accent'
@@ -119,13 +119,22 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
         <aside className='flex flex-col gap-6'>
           <div className='rounded-[2rem] border border-border bg-deep px-6 py-6 text-white shadow-[0_24px_60px_rgba(40,13,140,0.2)]'>
             <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-highlight'>
-              Discussion Slot
+              Discussion
             </p>
-            <h2 className='mt-4 font-display text-3xl tracking-[-0.04em]'>댓글 영역 자리</h2>
+            <h2 className='mt-4 font-display text-3xl tracking-[-0.04em]'>댓글 흐름</h2>
             <p className='mt-4 text-sm leading-7 text-white/72'>
-              M05에서 실제 댓글 작성과 대댓글 흐름이 이 영역 아래에 연결됩니다. 현재는
-              본문과 댓글의 시각적 구분을 먼저 확인하는 단계입니다.
+              댓글 작성, 답글, 삭제 흐름이 상세 페이지와 연결되었습니다. 한 단계 대댓글까지만
+              허용해 대화 계층을 단순하게 유지합니다.
             </p>
+            <div className='mt-6 rounded-[1.5rem] border border-white/14 bg-white/8 px-4 py-4'>
+              <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/58'>
+                Comment Rules
+              </p>
+              <p className='mt-3 text-sm leading-7 text-white/80'>
+                최신순 정렬로 표시되며, 대댓글에는 다시 답글을 달 수 없습니다. 삭제는 작성자
+                본인만 가능합니다.
+              </p>
+            </div>
           </div>
 
           <div className='rounded-[2rem] border border-border bg-surface px-6 py-6'>
@@ -142,40 +151,53 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
         </aside>
       </section>
 
-      <section className='rounded-[2rem] border border-border bg-surface px-6 py-7 shadow-[0_18px_48px_rgba(40,13,140,0.1)] sm:px-8'>
+      <section
+        id='comment-preview'
+        className='rounded-[2rem] border border-border bg-surface px-6 py-7 shadow-[0_18px_48px_rgba(40,13,140,0.1)] sm:px-8'
+      >
         <div className='flex items-center justify-between gap-4 border-b border-border pb-5'>
           <div>
             <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-accent'>
               Comment Preview
             </p>
             <h2 className='mt-3 font-display text-4xl tracking-[-0.04em] text-deep'>
-              댓글 미리보기
+              댓글
             </h2>
           </div>
           <span className='rounded-full bg-highlight-soft px-4 py-2 text-sm font-semibold text-deep'>
-            {commentPlaceholders.length} threads
+            {post.commentCount} threads
           </span>
         </div>
 
-        <div className='mt-6 space-y-4'>
-          {commentPlaceholders.map((comment) => (
-            <article
-              key={`${comment.author}-${comment.createdAt}`}
-              className='rounded-[1.5rem] border border-border bg-surface-strong px-5 py-5'
-            >
-              <div className='flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted'>
-                <span className='font-medium text-foreground'>u/{comment.author}</span>
-                <span>{comment.createdAt}</span>
-              </div>
-              <p className='mt-3 text-sm leading-7 text-foreground'>{comment.body}</p>
-              <button
-                type='button'
-                className='mt-4 text-sm font-semibold text-accent transition hover:text-accent-strong'
+        <div className='mt-6 rounded-[1.5rem] border border-border bg-surface-strong px-5 py-5'>
+          {session?.user?.id ? (
+            <CommentComposer
+              postId={post.id}
+              submitLabel='댓글 등록'
+              placeholder='이 게시글에 대한 의견을 남겨 보세요'
+            />
+          ) : (
+            <div className='flex flex-col gap-3'>
+              <p className='text-sm font-semibold text-deep'>댓글을 남기려면 로그인이 필요합니다.</p>
+              <p className='text-sm leading-7 text-muted'>
+                로그인 후 댓글과 대댓글을 작성할 수 있습니다.
+              </p>
+              <Link
+                href={`/login?callbackUrl=/r/${name}/${post.id}`}
+                className='inline-flex w-fit rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.22)] transition hover:bg-accent-strong'
               >
-                답글 달기
-              </button>
-            </article>
-          ))}
+                로그인하러 가기
+              </Link>
+            </div>
+          )}
+        </div>
+
+        <div className='mt-6'>
+          <CommentThreadList
+            comments={comments}
+            currentUserId={session?.user?.id ?? null}
+            postId={post.id}
+          />
         </div>
       </section>
     </div>
