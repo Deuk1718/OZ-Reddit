@@ -1,37 +1,12 @@
 import Link from 'next/link'
 
-type FeaturedSubreddit = {
-  name: string
-  members: string
-  description: string
-  tags: string[]
-}
+import { getSubreddits } from '@/application/use-cases/getSubreddits'
+import { PrismaSubredditRepository } from '@/infrastructure/db/repositories/PrismaSubredditRepository'
 
 type CommunityTrack = {
   label: string
   value: string
 }
-
-const featuredSubreddits: FeaturedSubreddit[] = [
-  {
-    name: 'r/designcrit',
-    members: '12.4k members',
-    description: '디자인 리뷰와 브랜드 톤 피드백이 빠르게 오가는 큐레이션 커뮤니티',
-    tags: ['UI Review', 'Brand Systems', 'Product Critique'],
-  },
-  {
-    name: 'r/sidebuild',
-    members: '8.1k members',
-    description: '사이드 프로젝트의 진행 로그, 실험 기록, 런칭 전 검증 노트를 모아보는 공간',
-    tags: ['Build Log', 'Validation', 'Launch Notes'],
-  },
-  {
-    name: 'r/k-startup',
-    members: '21.9k members',
-    description: '국내 초기 팀이 운영 경험과 시장 감각을 나누는 로컬 스타트업 커뮤니티',
-    tags: ['Startup Ops', 'Local Insight', 'Growth'],
-  },
-]
 
 const communityTracks: CommunityTrack[] = [
   { label: 'Design', value: '08 active spaces' },
@@ -40,7 +15,10 @@ const communityTracks: CommunityTrack[] = [
   { label: 'Startups', value: '11 active spaces' },
 ]
 
-export default function SubredditsPage() {
+export default async function SubredditsPage() {
+  const subredditRepository = new PrismaSubredditRepository()
+  const subreddits = await getSubreddits({ subredditRepository })
+
   return (
     <div className='flex w-full flex-col gap-8 pb-8'>
       <section className='grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_360px]'>
@@ -111,37 +89,55 @@ export default function SubredditsPage() {
           </div>
 
           <div className='mt-8 grid gap-4'>
-            {featuredSubreddits.map((subreddit) => (
-              <article
-                key={subreddit.name}
-                className='rounded-[1.7rem] border border-border bg-surface-strong p-5 transition hover:border-accent/30 hover:bg-white'
-              >
-                <div className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
-                  <div className='max-w-2xl'>
-                    <div className='flex flex-wrap items-center gap-3'>
-                      <h3 className='text-2xl font-semibold tracking-tight text-deep'>
-                        {subreddit.name}
-                      </h3>
-                      <span className='rounded-full bg-highlight-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-deep'>
-                        {subreddit.members}
+            {subreddits.length > 0 ? (
+              subreddits.map((subreddit) => (
+                <article
+                  key={subreddit.id}
+                  className='rounded-[1.7rem] border border-border bg-surface-strong p-5 transition hover:border-accent/30 hover:bg-white'
+                >
+                  <div className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
+                    <div className='max-w-2xl'>
+                      <div className='flex flex-wrap items-center gap-3'>
+                        <Link
+                          href={`/r/${subreddit.name}`}
+                          className='text-2xl font-semibold tracking-tight text-deep transition hover:text-accent'
+                        >
+                          r/{subreddit.name}
+                        </Link>
+                        <span className='rounded-full bg-highlight-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-deep'>
+                          {subreddit.memberCount} members
+                        </span>
+                      </div>
+                      <p className='mt-3 text-sm leading-7 text-muted'>
+                        {subreddit.description ?? '아직 소개 문구가 등록되지 않았습니다.'}
+                      </p>
+                    </div>
+
+                    <div className='flex flex-wrap gap-2 md:max-w-[240px] md:justify-end'>
+                      <span className='rounded-full border border-accent/14 bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent-strong'>
+                        {subreddit.postCount} posts
+                      </span>
+                      <span className='rounded-full border border-accent/14 bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent-strong'>
+                        u/{subreddit.creatorUsername ?? 'unknown'}
                       </span>
                     </div>
-                    <p className='mt-3 text-sm leading-7 text-muted'>{subreddit.description}</p>
                   </div>
-
-                  <div className='flex flex-wrap gap-2 md:max-w-[220px] md:justify-end'>
-                    {subreddit.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className='rounded-full border border-accent/14 bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent-strong'
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                </article>
+              ))
+            ) : (
+              <article className='rounded-[1.7rem] border border-dashed border-border bg-surface-strong p-6'>
+                <p className='text-sm font-semibold text-deep'>아직 생성된 서브레딧이 없습니다.</p>
+                <p className='mt-3 text-sm leading-7 text-muted'>
+                  첫 커뮤니티를 만들어 탐색 흐름을 시작해 보세요.
+                </p>
+                <Link
+                  href='/subreddits/create'
+                  className='mt-5 inline-flex rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.24)] transition hover:bg-accent-strong'
+                >
+                  첫 서브레딧 만들기
+                </Link>
               </article>
-            ))}
+            )}
           </div>
         </div>
 
