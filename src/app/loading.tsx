@@ -1,0 +1,46 @@
+export default function Loading() {
+  return (
+    <div className='mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6'>
+      <div className='grid grid-cols-1 gap-8 lg:grid-cols-12'>
+        {/* Left sidebar skeleton */}
+        <div className='hidden lg:block lg:col-span-2 space-y-6'>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className='h-8 rounded-xl bg-accent/10 animate-pulse' />
+          ))}
+        </div>
+
+        {/* Main content skeleton */}
+        <div className='lg:col-span-7 space-y-4'>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className='glass-card rounded-2xl p-5 space-y-3 animate-pulse'>
+              <div className='flex items-center gap-3'>
+                <div className='size-8 rounded-full bg-accent/20' />
+                <div className='h-3 w-32 rounded-full bg-accent/20' />
+              </div>
+              <div className='h-5 w-3/4 rounded-full bg-accent/10' />
+              <div className='h-3 w-full rounded-full bg-accent/10' />
+              <div className='h-3 w-2/3 rounded-full bg-accent/10' />
+              <div className='flex gap-4 pt-2'>
+                <div className='h-7 w-20 rounded-full bg-accent/10' />
+                <div className='h-7 w-16 rounded-full bg-accent/10' />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Right sidebar skeleton */}
+        <div className='hidden lg:block lg:col-span-3 space-y-4'>
+          <div className='glass-card rounded-2xl p-5 space-y-3 animate-pulse'>
+            <div className='h-4 w-24 rounded-full bg-accent/20' />
+            {[1, 2, 3].map((i) => (
+              <div key={i} className='flex items-center gap-3'>
+                <div className='size-8 rounded-lg bg-accent/20' />
+                <div className='h-3 w-28 rounded-full bg-accent/10' />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

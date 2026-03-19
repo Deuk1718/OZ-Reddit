@@ -1,22 +1,23 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #f5f6ff;
-  --foreground: #22185c;
-  --surface: #ffffff;
-  --surface-strong: #eff1ff;
-  --muted: #665f97;
-  --border: #d8ddff;
-  --accent: #4a30f2;
-  --accent-strong: #280d8c;
-  --accent-soft: rgba(118, 99, 242, 0.16);
-  --secondary: #7663f2;
-  --secondary-soft: rgba(118, 99, 242, 0.12);
-  --highlight: #ecf230;
-  --highlight-soft: rgba(236, 242, 48, 0.22);
-  --deep: #280d8c;
-  --danger: #b42318;
-  --shadow: rgba(40, 13, 140, 0.12);
+  --background: #1b1022;
+  --foreground: #e8e0f0;
+  --surface: rgba(45, 30, 60, 0.4);
+  --surface-strong: rgba(45, 30, 60, 0.6);
+  --muted: #9a8cb0;
+  --border: rgba(159, 31, 239, 0.2);
+  --accent: #9f1fef;
+  --accent-strong: #7a10c4;
+  --accent-soft: rgba(159, 31, 239, 0.14);
+  --secondary: #00f2ff;
+  --secondary-soft: rgba(0, 242, 255, 0.1);
+  --highlight: #00f2ff;
+  --highlight-soft: rgba(0, 242, 255, 0.12);
+  --deep: #f0e8ff;
+  --panel-dark: rgba(27, 16, 34, 0.7);
+  --danger: #ff6b6b;
+  --shadow: rgba(0, 0, 0, 0.4);
 }
 
 @theme inline {
@@ -34,32 +35,14 @@
   --color-highlight: var(--highlight);
   --color-highlight-soft: var(--highlight-soft);
   --color-deep: var(--deep);
+  --color-panel-dark: var(--panel-dark);
   --color-danger: var(--danger);
   --color-shadow: var(--shadow);
-  --font-sans: var(--font-manrope);
-  --font-display: var(--font-fraunces);
-  --font-mono: var(--font-jetbrains-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0d1022;
-    --foreground: #f3f5ff;
-    --surface: #151938;
-    --surface-strong: #1d2250;
-    --muted: #b8bdea;
-    --border: #31386b;
-    --accent: #7663f2;
-    --accent-strong: #4a30f2;
-    --accent-soft: rgba(118, 99, 242, 0.18);
-    --secondary: #4a30f2;
-    --secondary-soft: rgba(74, 48, 242, 0.14);
-    --highlight: #ecf230;
-    --highlight-soft: rgba(242, 232, 82, 0.16);
-    --deep: #f3f5ff;
-    --danger: #ff8c7a;
-    --shadow: rgba(0, 0, 0, 0.34);
-  }
+  --font-sans: var(--font-space-grotesk);
+  
+  --radius-default: 1rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
 }
 
 * {
@@ -68,13 +51,13 @@
 
 html {
   background:
-    radial-gradient(circle at top left, rgba(74, 48, 242, 0.2), transparent 24%),
-    radial-gradient(circle at top right, rgba(118, 99, 242, 0.16), transparent 30%),
-    radial-gradient(circle at bottom right, rgba(236, 242, 48, 0.1), transparent 24%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.7), transparent 20%),
-    var(--background);
+    radial-gradient(circle at 20% 20%, rgba(159, 31, 239, 0.15), transparent 40%),
+    radial-gradient(circle at 80% 10%, rgba(0, 242, 255, 0.08), transparent 35%),
+    radial-gradient(circle at 70% 80%, rgba(159, 31, 239, 0.08), transparent 40%),
+    #1b1022;
   color: var(--foreground);
   scroll-behavior: smooth;
+  min-height: 100vh;
 }
 
 body {
@@ -90,6 +73,143 @@ a {
 }
 
 ::selection {
-  background: var(--highlight);
-  color: var(--deep);
+  background: rgba(159, 31, 239, 0.3);
+  color: #ffffff;
+}
+
+/* ─── OZ Design System Utilities ─── */
+
+.glass-nav {
+  background: rgba(27, 16, 34, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(159, 31, 239, 0.2);
+}
+
+.glass-card {
+  background: rgba(43, 28, 54, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(159, 31, 239, 0.2);
+  border-radius: 1rem;
+}
+
+.glass-card-strong {
+  background: rgba(45, 28, 58, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(159, 31, 239, 0.3);
+  border-radius: 1rem;
+}
+
+.glass-input {
+  background: rgba(43, 28, 54, 0.4);
+  border: 1px solid rgba(159, 31, 239, 0.2);
+  border-radius: 0.75rem;
+  color: var(--foreground);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.glass-input:focus {
+  border-color: rgba(159, 31, 239, 0.6);
+  background: rgba(43, 28, 54, 0.6);
+}
+
+.glass-input::placeholder {
+  color: var(--muted);
+}
+
+.magic-card {
+  background: rgba(45, 30, 60, 0.4);
+  border: 1px solid rgba(159, 31, 239, 0.1);
+  transition: all 0.3s ease;
+}
+
+.magic-card:hover {
+  border-color: rgba(159, 31, 239, 0.5);
+  box-shadow: 0 0 20px rgba(159, 31, 239, 0.15);
+}
+
+.glowing-border {
+  box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+  border: 1px solid rgba(0, 242, 255, 0.5);
+}
+
+.glow-text {
+  text-shadow: 0 0 10px rgba(159, 31, 239, 0.5);
+}
+
+.thread-line {
+  width: 2px;
+  background: linear-gradient(to bottom, #9f1fef 0%, #00f2ff 100%);
+  box-shadow: 0 0 8px rgba(0, 242, 255, 0.4);
+}
+
+.oz-gradient-bg {
+  background: radial-gradient(circle at top right, #3b0764, #1b1022);
+}
+
+.cta-gradient {
+  background: linear-gradient(135deg, #9f1fef 0%, #06b6d4 100%);
+}
+
+.btn-gradient {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #9f1fef 0%, #06b6d4 100%);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-gradient:hover {
+  opacity: 0.9;
+  box-shadow: 0 0 16px rgba(159, 31, 239, 0.4);
+}
+
+/* ─── Layout Helpers ─── */
+
+.prose-oz {
+  color: var(--foreground);
+  line-height: 1.6;
+}
+
+.prose-oz p {
+  margin-bottom: 1rem;
+}
+
+.prose-oz blockquote {
+  border-left: 4px solid var(--secondary);
+  padding-left: 1rem;
+  font-style: italic;
+  color: var(--muted);
+  margin: 1.5rem 0;
+}
+
+/* ─── Magic Wand Cursor ─── */
+
+button,
+a,
+[role='button'],
+label[for],
+select,
+.btn-gradient {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cline x1='2' y1='22' x2='16' y2='8' stroke='%239f1fef' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpolygon points='16,2 18,8 22,6 20,12 14,10 16,4' fill='%2300f2ff' stroke='%239f1fef' stroke-width='1'/%3E%3Ccircle cx='18' cy='4' r='1.5' fill='%23f0e8ff'/%3E%3C/svg%3E") 2 22, pointer;
+}
+
+/* Material Symbols Customization */
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
 }

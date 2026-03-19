@@ -6,13 +6,14 @@ import { PrismaSubredditRepository } from '@/infrastructure/db/repositories/Pris
 type CommunityTrack = {
   label: string
   value: string
+  icon: string
 }
 
 const communityTracks: CommunityTrack[] = [
-  { label: 'Design', value: '08 active spaces' },
-  { label: 'Build', value: '14 active spaces' },
-  { label: 'Culture', value: '06 active spaces' },
-  { label: 'Startups', value: '11 active spaces' },
+  { label: 'Design', value: '08 active spaces', icon: 'palette' },
+  { label: 'Build', value: '14 active spaces', icon: 'construction' },
+  { label: 'Culture', value: '06 active spaces', icon: 'diversity_3' },
+  { label: 'Startups', value: '11 active spaces', icon: 'rocket_launch' },
 ]
 
 export default async function SubredditsPage() {
@@ -20,32 +21,31 @@ export default async function SubredditsPage() {
   const subreddits = await getSubreddits({ subredditRepository })
 
   return (
-    <div className='flex w-full flex-col gap-8 pb-8'>
-      <section className='grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_360px]'>
-        <div className='relative overflow-hidden rounded-[2rem] border border-border bg-surface px-6 py-8 shadow-[0_22px_70px_rgba(40,13,140,0.12)] sm:px-8'>
-          <div className='absolute inset-x-0 top-0 h-44 bg-[radial-gradient(circle_at_top_left,rgba(74,48,242,0.22),transparent_42%),radial-gradient(circle_at_top_right,rgba(236,242,48,0.14),transparent_32%)]' />
+    <div className='mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6'>
+      <section className='grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_340px]'>
+        <div className='glass-card relative overflow-hidden px-6 py-8 sm:px-8'>
+          <div className='absolute inset-x-0 top-0 h-44 bg-[radial-gradient(circle_at_top_left,rgba(159,31,239,0.2),transparent_42%),radial-gradient(circle_at_top_right,rgba(0,242,255,0.12),transparent_32%)]' />
           <div className='relative'>
-            <p className='inline-flex rounded-full border border-accent/20 bg-accent-soft px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-accent-strong'>
+            <p className='inline-flex rounded-full bg-accent-soft px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-accent'>
               Community Directory
             </p>
-            <h1 className='mt-6 max-w-3xl font-display text-5xl tracking-[-0.05em] text-deep sm:text-6xl'>
+            <h1 className='mt-6 max-w-3xl text-4xl font-bold tracking-tight text-deep sm:text-5xl'>
               관심사에 맞는 커뮤니티를 먼저 찾고, 그다음 대화에 들어갑니다
             </h1>
             <p className='mt-5 max-w-2xl text-sm leading-7 text-muted sm:text-base'>
               OZ-Reddit의 서브레딧 목록은 단순한 카테고리 나열이 아니라, 큐레이션된
-              탐색 경험을 제공하는 것을 목표로 합니다. 추천 커뮤니티와 테마별 트랙을
-              함께 보여줘 처음 들어온 사용자도 빠르게 맥락을 잡을 수 있게 합니다.
+              탐색 경험을 제공하는 것을 목표로 합니다.
             </p>
             <div className='mt-8 flex flex-col gap-3 sm:flex-row'>
               <Link
                 href='/subreddits/create'
-                className='rounded-full bg-accent px-6 py-3 text-center text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.24)] transition hover:bg-accent-strong'
+                className='btn-gradient px-6 py-3 text-center text-sm'
               >
                 새 커뮤니티 만들기
               </Link>
               <Link
                 href='/register'
-                className='rounded-full border border-border bg-surface-strong px-6 py-3 text-center text-sm font-semibold text-deep transition hover:border-accent hover:text-accent'
+                className='rounded-full border border-border px-6 py-3 text-center text-sm font-semibold text-foreground transition hover:border-accent hover:text-accent'
               >
                 가입 후 맞춤 추천 받기
               </Link>
@@ -53,125 +53,93 @@ export default async function SubredditsPage() {
           </div>
         </div>
 
-        <aside className='rounded-[2rem] border border-border bg-deep px-6 py-6 text-white shadow-[0_24px_60px_rgba(40,13,140,0.2)]'>
-          <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-highlight'>
+        <aside className='glass-card px-6 py-6'>
+          <p className='text-[11px] font-semibold uppercase tracking-widest text-secondary'>
             Browse Tracks
           </p>
-          <h2 className='mt-4 font-display text-3xl tracking-[-0.04em]'>주요 탐색 트랙</h2>
+          <h2 className='mt-4 text-2xl font-bold tracking-tight text-deep'>주요 탐색 트랙</h2>
           <div className='mt-6 space-y-3'>
             {communityTracks.map((track) => (
               <article
                 key={track.label}
-                className='rounded-[1.4rem] border border-white/10 bg-white/6 px-4 py-4'
+                className='glass-card-strong flex items-center gap-3 px-4 py-4'
               >
-                <p className='text-sm font-semibold text-white'>{track.label}</p>
-                <p className='mt-2 text-sm text-white/68'>{track.value}</p>
+                <span className='material-symbols-outlined text-[20px] text-secondary'>{track.icon}</span>
+                <div>
+                  <p className='text-sm font-semibold text-foreground'>{track.label}</p>
+                  <p className='mt-1 text-sm text-muted'>{track.value}</p>
+                </div>
               </article>
             ))}
           </div>
         </aside>
       </section>
 
-      <section className='grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]'>
-        <div className='rounded-[2rem] border border-border bg-surface px-6 py-7 shadow-[0_18px_48px_rgba(40,13,140,0.1)] sm:px-8'>
-          <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
-            <div>
-              <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-accent'>
-                Featured Picks
-              </p>
-              <h2 className='mt-3 font-display text-4xl tracking-[-0.04em] text-deep'>
-                추천 커뮤니티
-              </h2>
-            </div>
-            <p className='max-w-md text-sm leading-6 text-muted'>
-              실제 M02 구현에서는 정렬, 멤버 수, 최신 활동 기준이 이 영역에 연결됩니다.
+      <section className='glass-card px-6 py-7 sm:px-8'>
+        <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
+          <div>
+            <p className='text-[11px] font-semibold uppercase tracking-widest text-accent'>
+              Featured Picks
             </p>
+            <h2 className='mt-3 text-3xl font-bold tracking-tight text-deep'>
+              추천 커뮤니티
+            </h2>
           </div>
-
-          <div className='mt-8 grid gap-4'>
-            {subreddits.length > 0 ? (
-              subreddits.map((subreddit) => (
-                <article
-                  key={subreddit.id}
-                  className='rounded-[1.7rem] border border-border bg-surface-strong p-5 transition hover:border-accent/30 hover:bg-white'
-                >
-                  <div className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
-                    <div className='max-w-2xl'>
-                      <div className='flex flex-wrap items-center gap-3'>
-                        <Link
-                          href={`/r/${subreddit.name}`}
-                          className='text-2xl font-semibold tracking-tight text-deep transition hover:text-accent'
-                        >
-                          r/{subreddit.name}
-                        </Link>
-                        <span className='rounded-full bg-highlight-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-deep'>
-                          {subreddit.memberCount} members
-                        </span>
-                      </div>
-                      <p className='mt-3 text-sm leading-7 text-muted'>
-                        {subreddit.description ?? '아직 소개 문구가 등록되지 않았습니다.'}
-                      </p>
-                    </div>
-
-                    <div className='flex flex-wrap gap-2 md:max-w-[240px] md:justify-end'>
-                      <span className='rounded-full border border-accent/14 bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent-strong'>
-                        {subreddit.postCount} posts
-                      </span>
-                      <span className='rounded-full border border-accent/14 bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent-strong'>
-                        u/{subreddit.creatorUsername ?? 'unknown'}
-                      </span>
-                    </div>
-                  </div>
-                </article>
-              ))
-            ) : (
-              <article className='rounded-[1.7rem] border border-dashed border-border bg-surface-strong p-6'>
-                <p className='text-sm font-semibold text-deep'>아직 생성된 서브레딧이 없습니다.</p>
-                <p className='mt-3 text-sm leading-7 text-muted'>
-                  첫 커뮤니티를 만들어 탐색 흐름을 시작해 보세요.
-                </p>
-                <Link
-                  href='/subreddits/create'
-                  className='mt-5 inline-flex rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.24)] transition hover:bg-accent-strong'
-                >
-                  첫 서브레딧 만들기
-                </Link>
-              </article>
-            )}
-          </div>
+          <p className='max-w-md text-sm leading-6 text-muted'>
+            멤버 수, 최신 활동 기준으로 정렬됩니다.
+          </p>
         </div>
 
-        <aside className='flex flex-col gap-6'>
-          <div className='rounded-[2rem] border border-border bg-surface px-6 py-6'>
-            <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-accent'>
-              Design Note
-            </p>
-            <h2 className='mt-3 font-display text-3xl tracking-[-0.04em] text-deep'>
-              목록 페이지 설계 원칙
-            </h2>
-            <ul className='mt-6 space-y-4 text-sm leading-7 text-muted'>
-              <li className='rounded-[1.2rem] border border-border bg-surface-strong px-4 py-3'>
-                추천 커뮤니티와 전체 목록을 분리해 첫 진입의 피로를 줄입니다.
-              </li>
-              <li className='rounded-[1.2rem] border border-border bg-surface-strong px-4 py-3'>
-                카드형과 리스트형의 중간 밀도로 스캔성과 정보량을 함께 가져갑니다.
-              </li>
-              <li className='rounded-[1.2rem] border border-border bg-surface-strong px-4 py-3'>
-                실제 데이터 연결 전에도 이후 확장 구조가 보이도록 섹션을 설계합니다.
-              </li>
-            </ul>
-          </div>
+        <div className='mt-8 grid gap-4'>
+          {subreddits.length > 0 ? (
+            subreddits.map((subreddit) => (
+              <Link
+                key={subreddit.id}
+                href={`/r/${subreddit.name}`}
+                className='magic-card rounded-2xl p-5 block cursor-pointer'
+              >
+                <div className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
+                  <div className='max-w-2xl'>
+                    <div className='flex flex-wrap items-center gap-3'>
+                      <span className='text-xl font-semibold tracking-tight text-deep transition hover:text-accent'>
+                        z/{subreddit.name}
+                      </span>
+                      <span className='flex items-center gap-1 rounded-full bg-secondary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-secondary'>
+                        <span className='material-symbols-outlined text-[14px]'>group</span>
+                        {subreddit.memberCount} members
+                      </span>
+                    </div>
+                    <p className='mt-3 text-sm leading-7 text-muted'>
+                      {subreddit.description ?? '아직 소개 문구가 등록되지 않았습니다.'}
+                    </p>
+                  </div>
 
-          <div className='rounded-[2rem] border border-border bg-[linear-gradient(180deg,rgba(236,242,48,0.22),rgba(255,255,255,0.96))] px-6 py-6'>
-            <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-accent-strong'>
-              Next Step
-            </p>
-            <p className='mt-4 text-sm leading-7 text-deep'>
-              다음 단계에서는 이 구조에 실제 정렬 바, 검색 입력, 생성 폼 진입 흐름을
-              붙이면 M02의 UI 뼈대가 완성됩니다.
-            </p>
-          </div>
-        </aside>
+                  <div className='flex flex-wrap gap-2 md:max-w-[240px] md:justify-end'>
+                    <span className='rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent'>
+                      {subreddit.postCount} posts
+                    </span>
+                    <span className='rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent'>
+                      u/{subreddit.creatorUsername ?? 'unknown'}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <article className='glass-card border-dashed p-6'>
+              <p className='text-sm font-semibold text-deep'>아직 생성된 서브레딧이 없습니다.</p>
+              <p className='mt-3 text-sm leading-7 text-muted'>
+                첫 커뮤니티를 만들어 탐색 흐름을 시작해 보세요.
+              </p>
+              <Link
+                href='/subreddits/create'
+                className='btn-gradient mt-5 inline-flex px-5 py-3 text-sm'
+              >
+                첫 서브레딧 만들기
+              </Link>
+            </article>
+          )}
+        </div>
       </section>
     </div>
   )

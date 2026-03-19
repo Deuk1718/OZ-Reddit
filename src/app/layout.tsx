@@ -1,29 +1,20 @@
 import type { Metadata } from 'next'
-import { Fraunces, JetBrains_Mono, Manrope } from 'next/font/google'
+import { Space_Grotesk } from 'next/font/google'
 
 import { AppHeader } from '@/components/layout/AppHeader'
+import { MagicCursor } from '@/components/layout/MagicCursor'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 
 import './globals.css'
 
-const manrope = Manrope({
-  variable: '--font-manrope',
-  subsets: ['latin'],
-})
-
-const fraunces = Fraunces({
-  variable: '--font-fraunces',
-  subsets: ['latin'],
-})
-
-const jetBrainsMono = JetBrains_Mono({
-  variable: '--font-jetbrains-mono',
+const spaceGrotesk = Space_Grotesk({
+  variable: '--font-space-grotesk',
   subsets: ['latin'],
 })
 
 export const metadata: Metadata = {
   title: 'OZ-Reddit Community',
-  description: '정돈된 구조와 선명한 콘텐츠 밀도를 가진 커뮤니티 플랫폼',
+  description: 'Your journey through the magical Land of Oz begins here.',
 }
 
 export default function RootLayout({
@@ -32,16 +23,23 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang='ko'>
-      <body
-        className={`${manrope.variable} ${fraunces.variable} ${jetBrainsMono.variable} antialiased`}
-      >
+    <html lang='ko' className='dark'>
+      <head>
+        <link rel='preconnect' href='https://fonts.googleapis.com' />
+        <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='anonymous' />
+        <link
+          href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200'
+          rel='stylesheet'
+        />
+      </head>
+      <body className={`${spaceGrotesk.variable} font-sans antialiased text-slate-100 min-h-screen bg-background`}>
         <SessionProvider>
-          <div className='min-h-screen bg-background text-foreground'>
+          <MagicCursor />
+          <div className='relative flex flex-col min-h-screen'>
             <AppHeader />
-            <main className='mx-auto flex w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8'>
+            <div className='flex-1 w-full'>
               {children}
-            </main>
+            </div>
           </div>
         </SessionProvider>
       </body>

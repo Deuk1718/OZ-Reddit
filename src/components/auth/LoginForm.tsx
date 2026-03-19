@@ -45,14 +45,14 @@ export function LoginForm() {
     setIsSubmitting(false)
 
     if (!result) {
-      setSubmitError('로그인 요청을 처리하지 못했습니다.')
+      setSubmitError('Failed to process login request.')
       return
     }
 
     if (result.error) {
       setFieldErrors({
-        email: '이메일 또는 비밀번호를 확인해 주세요.',
-        password: '이메일 또는 비밀번호를 확인해 주세요.',
+        email: 'Please check your email or password.',
+        password: 'Please check your email or password.',
       })
       return
     }
@@ -62,57 +62,54 @@ export function LoginForm() {
   }
 
   return (
-    <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='email' className='text-sm font-medium text-foreground'>
-          이메일
-        </label>
-        <input
-          id='email'
-          type='email'
-          value={email}
-          onChange={(event) => {
-            setEmail(event.target.value)
-            setFieldErrors((current) => ({ ...current, email: undefined }))
-          }}
-          className='rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-accent focus:bg-surface'
-          placeholder='you@example.com'
-          autoComplete='email'
-        />
-        {fieldErrors.email ? (
-          <p className='text-sm text-danger'>{fieldErrors.email}</p>
-        ) : null}
+    <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
+      <div className='space-y-2'>
+        <label className='text-sm font-medium text-slate-300 ml-1'>Magic Scroll (Email)</label>
+        <div className='relative'>
+          <span className='material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500'>mail</span>
+          <input
+            type='email'
+            value={email}
+            onChange={(event) => {
+              setEmail(event.target.value)
+              setFieldErrors((current) => ({ ...current, email: undefined }))
+            }}
+            className='w-full bg-background/50 border border-slate-700/50 rounded-lg py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all outline-none placeholder:text-slate-600'
+            placeholder='name@emeraldcity.com'
+            autoComplete='email'
+          />
+        </div>
+        {fieldErrors.email && <p className='text-xs text-danger ml-1'>{fieldErrors.email}</p>}
       </div>
 
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='password' className='text-sm font-medium text-foreground'>
-          비밀번호
-        </label>
-        <input
-          id='password'
-          type='password'
-          value={password}
-          onChange={(event) => {
-            setPassword(event.target.value)
-            setFieldErrors((current) => ({ ...current, password: undefined }))
-          }}
-          className='rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-accent focus:bg-surface'
-          placeholder='비밀번호를 입력하세요'
-          autoComplete='current-password'
-        />
-        {fieldErrors.password ? (
-          <p className='text-sm text-danger'>{fieldErrors.password}</p>
-        ) : null}
+      <div className='space-y-2'>
+        <label className='text-sm font-medium text-slate-300 ml-1'>Secret Spell (Password)</label>
+        <div className='relative'>
+          <span className='material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500'>lock</span>
+          <input
+            type='password'
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value)
+              setFieldErrors((current) => ({ ...current, password: undefined }))
+            }}
+            className='w-full bg-background/50 border border-slate-700/50 rounded-lg py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all outline-none placeholder:text-slate-600'
+            placeholder='Enter your incantation'
+            autoComplete='current-password'
+          />
+        </div>
+        {fieldErrors.password && <p className='text-xs text-danger ml-1'>{fieldErrors.password}</p>}
       </div>
 
-      {submitError ? <p className='text-sm text-danger'>{submitError}</p> : null}
+      {submitError && <p className='text-sm text-danger text-center'>{submitError}</p>}
 
       <button
         type='submit'
         disabled={isSubmitting}
-        className='rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.22)] transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60'
+        className='cta-gradient w-full py-4 rounded-lg text-white font-bold text-lg shadow-xl hover:opacity-90 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed'
       >
-        {isSubmitting ? '로그인 중...' : '로그인'}
+        <span>{isSubmitting ? 'Casting Spell...' : 'Summon Profile'}</span>
+        {!isSubmitting && <span className='material-symbols-outlined'>east</span>}
       </button>
     </form>
   )

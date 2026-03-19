@@ -78,7 +78,7 @@ export function CreatePostForm({ subredditName }: CreatePostFormProps) {
             setFieldErrors((current) => ({ ...current, title: undefined }))
           }}
           placeholder='예: 피드 디자인에서 메타 정보 우선순위를 어떻게 정하고 계신가요?'
-          className='rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-accent focus:bg-surface'
+          className='glass-input px-4 py-3 text-sm'
         />
         {fieldErrors.title ? (
           <p className='text-sm text-danger'>{fieldErrors.title}</p>
@@ -100,7 +100,8 @@ export function CreatePostForm({ subredditName }: CreatePostFormProps) {
             setFieldErrors((current) => ({ ...current, body: undefined }))
           }}
           placeholder='현재 상황, 시도한 것, 원하는 피드백을 순서대로 적어보세요.'
-          className='rounded-[1.5rem] border border-border bg-background px-4 py-4 text-sm leading-7 text-foreground outline-none transition focus:border-accent focus:bg-surface'
+          className='glass-input px-4 py-4 text-sm leading-7'
+          style={{ borderRadius: '1.5rem' }}
         />
         {fieldErrors.body ? (
           <p className='text-sm text-danger'>{fieldErrors.body}</p>
@@ -111,13 +112,13 @@ export function CreatePostForm({ subredditName }: CreatePostFormProps) {
         )}
       </div>
 
-      <div className='rounded-[1.7rem] border border-border bg-surface-strong px-5 py-5'>
-        <p className='text-[11px] font-semibold uppercase tracking-[0.24em] text-accent'>
+      <div className='glass-card-strong px-5 py-5'>
+        <p className='text-[11px] font-semibold uppercase tracking-widest text-secondary'>
           Preview Tone
         </p>
-        <div className='mt-4 rounded-[1.5rem] border border-border bg-surface px-4 py-4'>
-          <p className='text-sm font-semibold text-deep'>r/{subredditName}</p>
-          <h2 className='mt-3 text-2xl font-semibold tracking-tight text-deep'>
+        <div className='glass-card mt-4 px-4 py-4'>
+          <p className='text-sm font-semibold text-accent'>z/{subredditName}</p>
+          <h2 className='mt-3 text-xl font-semibold tracking-tight text-deep'>
             {title || '피드에 올라갈 제목 미리보기'}
           </h2>
           <p className='mt-3 text-sm leading-7 text-muted'>
@@ -132,7 +133,7 @@ export function CreatePostForm({ subredditName }: CreatePostFormProps) {
         <button
           type='submit'
           disabled={isSubmitting}
-          className='rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.24)] transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60'
+          className='btn-gradient px-5 py-3 text-sm'
         >
           {isSubmitting ? '게시 중...' : '게시글 작성'}
         </button>

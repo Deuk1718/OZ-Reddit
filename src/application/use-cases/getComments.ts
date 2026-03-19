@@ -8,6 +8,7 @@ import { CommentNotFoundError } from './commentErrors'
 
 export type GetCommentsRequest = {
   postId: string
+  viewerUserId?: string
 }
 
 type GetCommentsDependencies = {
@@ -23,11 +24,14 @@ export async function getComments(
     throw new CommentNotFoundError('게시글을 찾을 수 없습니다.')
   }
 
-  const post = await dependencies.postRepository.findById(input.postId)
+  const post = await dependencies.postRepository.findById(
+    input.postId,
+    input.viewerUserId
+  )
 
   if (!post) {
     throw new CommentNotFoundError('게시글을 찾을 수 없습니다.')
   }
 
-  return dependencies.commentRepository.getByPostId(post.id)
+  return dependencies.commentRepository.getByPostId(post.id, input.viewerUserId)
 }

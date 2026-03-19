@@ -18,10 +18,14 @@ type PostRouteProps = {
 
 export async function GET(_request: Request, { params }: PostRouteProps) {
   const { id } = await params
+  const session = await getServerSession(authOptions)
 
   try {
     const postRepository = new PrismaPostRepository()
-    const post = await getPostById(id, { postRepository })
+    const post = await getPostById(id, {
+      postRepository,
+      viewerUserId: session?.user?.id,
+    })
 
     return NextResponse.json({ post }, { status: 200 })
   } catch (error: unknown) {

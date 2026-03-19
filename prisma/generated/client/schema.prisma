@@ -1,0 +1,105 @@
+// OZ-Reddit MVP Prisma 스키마
+// PRD Section 4 DB 스키마 기반
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+generator seedClient {
+  provider = "prisma-client-js"
+  output   = "../prisma/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 사용자
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  username     String   @unique @db.VarChar(30)
+  nickname     String   @db.VarChar(30)
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  interests    String[] @default([])
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  subreddits Subreddit[] @relation("SubredditCreator")
+  posts      Post[]
+  comments   Comment[]
+  votes      Vote[]
+
+  @@map("users")
+}
+
+// 서브레딧
+model Subreddit {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(21)
+  description String?  @db.Text
+  createdBy   String?  @map("created_by") @db.Uuid
+  memberCount Int      @default(0) @map("member_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  creator User?  @relation("SubredditCreator", fields: [createdBy], references: [id])
+  posts   Post[]
+
+  @@map("subreddits")
+}
+
+// 게시글
+model Post {
+  id           String   @id @default(uuid()) @db.Uuid
+  title        String   @db.VarChar(300)
+  body         String?  @db.Text
+  authorId     String?  @map("author_id") @db.Uuid
+  subredditId  String   @map("subreddit_id") @db.Uuid
+  score        Int      @default(0)
+  commentCount Int      @default(0) @map("comment_count")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  author    User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  subreddit Subreddit @relation(fields: [subredditId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+
+  @@index([subredditId, createdAt(sort: Desc)], name: "idx_posts_subreddit")
+  @@index([score(sort: Desc)], name: "idx_posts_score")
+  @@map("posts")
+}
+
+// 댓글 (1단계 중첩)
+model Comment {
+  id        String   @id @default(uuid()) @db.Uuid
+  body      String   @db.Text
+  authorId  String?  @map("author_id") @db.Uuid
+  postId    String   @map("post_id") @db.Uuid
+  parentId  String?  @map("parent_id") @db.Uuid
+  score     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  author  User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([postId, createdAt], name: "idx_comments_post")
+  @@map("comments")
+}
+
+// 투표
+model Vote {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  targetType String   @map("target_type") @db.VarChar(10) // 'post' | 'comment'
+  targetId   String   @map("target_id") @db.Uuid
+  value      Int      @db.SmallInt // -1 | 1
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, targetType, targetId])
+  @@index([targetType, targetId], name: "idx_votes_target")
+  @@map("votes")
+}

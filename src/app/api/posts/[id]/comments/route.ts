@@ -29,6 +29,7 @@ function isCreateCommentRequestBody(value: unknown): value is CreateCommentReque
 
 export async function GET(_request: Request, { params }: CommentRouteProps) {
   const { id } = await params
+  const session = await getServerSession(authOptions)
 
   try {
     const commentRepository = new PrismaCommentRepository()
@@ -36,6 +37,7 @@ export async function GET(_request: Request, { params }: CommentRouteProps) {
     const comments = await getComments(
       {
         postId: id,
+        viewerUserId: session?.user?.id,
       },
       { commentRepository, postRepository }
     )
@@ -49,6 +51,7 @@ export async function GET(_request: Request, { params }: CommentRouteProps) {
       )
     }
 
+    console.error('[GET /api/posts/[id]/comments]', error)
     return NextResponse.json(
       { message: '댓글 조회 중 오류가 발생했습니다.' },
       { status: 500 }
@@ -107,6 +110,8 @@ export async function POST(request: Request, { params }: CommentRouteProps) {
       )
     }
 
+    console.error('[POST /api/posts/[id]/comments] error:', error instanceof Error ? error.message : error)
+    if (error instanceof Error && error.stack) console.error(error.stack)
     return NextResponse.json(
       { message: '댓글 작성 중 오류가 발생했습니다.' },
       { status: 500 }

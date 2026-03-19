@@ -7,9 +7,14 @@ export type CreatePostInput = {
   subredditName: string
 }
 
+export type GetPostsOptions = {
+  subredditName?: string
+  viewerUserId?: string
+}
+
 export interface PostRepository {
   create(input: CreatePostInput): Promise<Post>
-  findById(id: string): Promise<Post | null>
-  getAll(subredditName?: string): Promise<Post[]>
+  findById(id: string, viewerUserId?: string): Promise<Post | null>
+  getAll(options?: GetPostsOptions): Promise<Post[]>
   delete(id: string): Promise<void>
 }

@@ -34,16 +34,17 @@ export function DeletePostButton({ postId, subredditName }: DeletePostButtonProp
   }
 
   return (
-    <div className='flex flex-col items-start gap-2'>
+    <div className='flex flex-col items-center gap-2'>
       <button
         type='button'
         disabled={isDeleting}
         onClick={handleDelete}
-        className='rounded-full border border-danger/24 bg-danger/6 px-4 py-2 text-sm font-semibold text-danger transition hover:bg-danger hover:text-white disabled:cursor-not-allowed disabled:opacity-60'
+        title={isDeleting ? '삭제 중...' : '삭제'}
+        className='w-10 h-10 rounded-full bg-background border border-danger/20 flex items-center justify-center hover:bg-danger/20 group disabled:cursor-not-allowed disabled:opacity-60 transition-colors'
       >
-        {isDeleting ? '삭제 중...' : '삭제'}
+        <span className='material-symbols-outlined text-danger text-[18px]'>delete</span>
       </button>
-      {errorMessage ? <p className='text-sm text-danger'>{errorMessage}</p> : null}
+      {errorMessage ? <p className='text-xs text-danger text-center'>{errorMessage}</p> : null}
     </div>
   )
 }

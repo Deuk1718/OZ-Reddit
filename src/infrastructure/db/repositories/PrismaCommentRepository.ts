@@ -1,3 +1,5 @@
+import { Prisma } from '@/generated/prisma/client'
+
 import { prisma } from '@/infrastructure/db/prisma'
 
 import type {
@@ -5,6 +7,9 @@ import type {
   CreateCommentInput,
 } from '@/application/repositories/CommentRepository'
 import type { Comment } from '@/domain/entities/Comment'
+import type { CurrentVoteValue } from '@/domain/entities/Vote'
+
+import { CommentAuthorizationError } from '@/application/use-cases/commentErrors'
 
 type CommentRecord = {
   id: string
@@ -19,7 +24,37 @@ type CommentRecord = {
   } | null
 }
 
-function toDomainComment(comment: CommentRecord): Comment {
+async function getCommentVoteMap(
+  commentIds: string[],
+  viewerUserId?: string
+): Promise<Map<string, CurrentVoteValue>> {
+  if (!viewerUserId || commentIds.length === 0) {
+    return new Map()
+  }
+
+  const votes = await prisma.vote.findMany({
+    where: {
+      userId: viewerUserId,
+      targetType: 'comment',
+      targetId: {
+        in: commentIds,
+      },
+    },
+    select: {
+      targetId: true,
+      value: true,
+    },
+  })
+
+  return new Map(
+    votes.map((vote) => [vote.targetId, vote.value as CurrentVoteValue])
+  )
+}
+
+function toDomainComment(
+  comment: CommentRecord,
+  currentUserVote: CurrentVoteValue = 0
+): Comment {
   return {
     id: comment.id,
     body: comment.body,
@@ -28,6 +63,7 @@ function toDomainComment(comment: CommentRecord): Comment {
     postId: comment.postId,
     parentId: comment.parentId,
     score: comment.score,
+    currentUserVote,
     createdAt: comment.createdAt,
     replies: [],
   }
@@ -80,6 +116,14 @@ export class PrismaCommentRepository implements CommentRepository {
       })
 
       return createdComment
+    }).catch((error: unknown) => {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new CommentAuthorizationError('유효하지 않은 사용자입니다. 다시 로그인해 주세요.')
+      }
+      throw error
     })
 
     return toDomainComment(comment)
@@ -94,7 +138,7 @@ export class PrismaCommentRepository implements CommentRepository {
     return comment ? toDomainComment(comment) : null
   }
 
-  async getByPostId(postId: string): Promise<Comment[]> {
+  async getByPostId(postId: string, viewerUserId?: string): Promise<Comment[]> {
     const comments = await prisma.comment.findMany({
       where: { postId },
       include: commentInclude,
@@ -103,9 +147,16 @@ export class PrismaCommentRepository implements CommentRepository {
       },
     })
 
+    const voteMap = await getCommentVoteMap(
+      comments.map((comment) => comment.id),
+      viewerUserId
+    )
     const commentMap = new Map<string, Comment>(
       comments.map((commentRecord) => {
-        const comment = toDomainComment(commentRecord)
+        const comment = toDomainComment(
+          commentRecord,
+          voteMap.get(commentRecord.id) ?? 0
+        )
         return [comment.id, comment]
       })
     )

@@ -32,6 +32,8 @@ export function CommentComposer({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (!body.trim()) return
+    
     setSubmitError('')
     setIsSubmitting(true)
 
@@ -53,7 +55,7 @@ export function CommentComposer({
       setFieldErrors({
         body: json?.fieldErrors?.body,
       })
-      setSubmitError(json?.message ?? '댓글 작성 중 오류가 발생했습니다.')
+      setSubmitError(json?.message ?? 'Failed to scribe your message.')
       return
     }
 
@@ -75,27 +77,27 @@ export function CommentComposer({
         }}
         placeholder={placeholder}
         rows={parentId ? 3 : 4}
-        className='min-h-[120px] rounded-[1.5rem] border border-border bg-background px-4 py-4 text-sm leading-7 text-foreground outline-none transition focus:border-accent focus:bg-surface'
+        className='w-full bg-background/50 border border-accent/20 rounded-lg p-3 text-sm focus:ring-secondary focus:border-secondary resize-none outline-none text-slate-100 placeholder:text-slate-500 transition-all'
       />
-      {fieldErrors.body ? <p className='text-sm text-danger'>{fieldErrors.body}</p> : null}
-      {submitError ? <p className='text-sm text-danger'>{submitError}</p> : null}
-      <div className='flex flex-wrap gap-3'>
-        <button
-          type='submit'
-          disabled={isSubmitting}
-          className='rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.22)] transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60'
-        >
-          {isSubmitting ? '저장 중...' : submitLabel}
-        </button>
-        {onCancel && cancelLabel ? (
+      {fieldErrors.body ? <p className='text-xs text-danger ml-1'>{fieldErrors.body}</p> : null}
+      {submitError ? <p className='text-xs text-danger ml-1'>{submitError}</p> : null}
+      <div className='flex justify-end gap-3'>
+        {onCancel && cancelLabel && (
           <button
             type='button'
             onClick={onCancel}
-            className='rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-deep transition hover:border-accent hover:text-accent'
+            className='px-4 py-2 rounded-full text-xs font-bold text-slate-400 hover:text-slate-200 transition-all'
           >
             {cancelLabel}
           </button>
-        ) : null}
+        )}
+        <button
+          type='submit'
+          disabled={isSubmitting || !body.trim()}
+          className='bg-accent hover:bg-accent-strong disabled:opacity-50 disabled:cursor-not-allowed px-6 py-2 rounded-full text-sm font-bold transition-all text-white'
+        >
+          {isSubmitting ? 'Scribing...' : submitLabel}
+        </button>
       </div>
     </form>
   )

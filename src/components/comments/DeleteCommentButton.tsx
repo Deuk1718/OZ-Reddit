@@ -32,16 +32,17 @@ export function DeleteCommentButton({ commentId }: DeleteCommentButtonProps) {
   }
 
   return (
-    <div className='flex flex-col items-start gap-2'>
+    <div className='flex flex-col items-start gap-1'>
       <button
         type='button'
         disabled={isDeleting}
         onClick={handleDelete}
-        className='text-sm font-semibold text-danger transition hover:text-danger disabled:cursor-not-allowed disabled:opacity-60'
+        title={isDeleting ? '삭제 중...' : '삭제'}
+        className='flex items-center justify-center text-danger transition hover:text-danger/70 disabled:cursor-not-allowed disabled:opacity-60'
       >
-        {isDeleting ? '삭제 중...' : '삭제'}
+        <span className='material-symbols-outlined text-[16px]'>delete</span>
       </button>
-      {errorMessage ? <p className='text-sm text-danger'>{errorMessage}</p> : null}
+      {errorMessage ? <p className='text-xs text-danger'>{errorMessage}</p> : null}
     </div>
   )
 }

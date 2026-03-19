@@ -1,0 +1,9 @@
+- [x] Prisma 스키마와 게시글/댓글 조회 구조를 확인한다
+- [x] Vote 도메인 엔티티와 리포지토리 인터페이스를 정의한다
+- [x] castVote 및 vote 취소 유스케이스를 구현한다
+- [x] PrismaVoteRepository와 점수 반영 트랜잭션을 구현한다
+- [x] 게시글/댓글 조회 결과에 현재 사용자 투표 상태를 포함한다
+- [x] `/api/votes` 및 `/api/votes/[targetType]/[targetId]` Route Handler를 구현한다
+- [x] `VoteButton` 클라이언트 컴포넌트에 낙관적 업데이트를 적용한다
+- [x] PostCard, 게시글 상세, CommentThreadList에 VoteButton을 연결한다
+- [x] 구현 결과를 타입체크로 검증하고 체크리스트를 갱신한다

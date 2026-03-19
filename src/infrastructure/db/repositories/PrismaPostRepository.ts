@@ -1,6 +1,11 @@
 import { prisma } from '@/infrastructure/db/prisma'
 
-import type { CreatePostInput, PostRepository } from '@/application/repositories/PostRepository'
+import type {
+  CreatePostInput,
+  GetPostsOptions,
+  PostRepository,
+} from '@/application/repositories/PostRepository'
+import type { CurrentVoteValue } from '@/domain/entities/Vote'
 import type { Post } from '@/domain/entities/Post'
 
 type PostRecord = {
@@ -34,7 +39,37 @@ const postInclude = {
   },
 } as const
 
-function toDomainPost(post: PostRecord): Post {
+async function getPostVoteMap(
+  postIds: string[],
+  viewerUserId?: string
+): Promise<Map<string, CurrentVoteValue>> {
+  if (!viewerUserId || postIds.length === 0) {
+    return new Map()
+  }
+
+  const votes = await prisma.vote.findMany({
+    where: {
+      userId: viewerUserId,
+      targetType: 'post',
+      targetId: {
+        in: postIds,
+      },
+    },
+    select: {
+      targetId: true,
+      value: true,
+    },
+  })
+
+  return new Map(
+    votes.map((vote) => [vote.targetId, vote.value as CurrentVoteValue])
+  )
+}
+
+function toDomainPost(
+  post: PostRecord,
+  currentUserVote: CurrentVoteValue = 0
+): Post {
   return {
     id: post.id,
     title: post.title,
@@ -44,6 +79,7 @@ function toDomainPost(post: PostRecord): Post {
     subredditId: post.subredditId,
     subredditName: post.subreddit.name,
     score: post.score,
+    currentUserVote,
     commentCount: post.commentCount,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
@@ -73,28 +109,39 @@ export class PrismaPostRepository implements PostRepository {
     return toDomainPost(post)
   }
 
-  async findById(id: string): Promise<Post | null> {
+  async findById(id: string, viewerUserId?: string): Promise<Post | null> {
     const post = await prisma.post.findUnique({
       where: { id },
       include: postInclude,
     })
 
-    return post ? toDomainPost(post) : null
+    if (!post) {
+      return null
+    }
+
+    const voteMap = await getPostVoteMap([post.id], viewerUserId)
+
+    return toDomainPost(post, voteMap.get(post.id) ?? 0)
   }
 
-  async getAll(subredditName?: string): Promise<Post[]> {
+  async getAll(options?: GetPostsOptions): Promise<Post[]> {
     const posts = await prisma.post.findMany({
-      where: subredditName
+      where: options?.subredditName
         ? {
             subreddit: {
-              name: subredditName,
+              name: options.subredditName,
             },
           }
         : undefined,
       include: postInclude,
     })
 
-    return posts.map(toDomainPost)
+    const voteMap = await getPostVoteMap(
+      posts.map((post) => post.id),
+      options?.viewerUserId
+    )
+
+    return posts.map((post) => toDomainPost(post, voteMap.get(post.id) ?? 0))
   }
 
   async delete(id: string): Promise<void> {

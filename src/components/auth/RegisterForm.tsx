@@ -75,7 +75,7 @@ export function RegisterForm() {
       nickname: validateNickname(normalizeNickname(draft.nickname)) ?? undefined,
       password: validatePassword(draft.password) ?? undefined,
       confirmPassword:
-        draft.password === draft.confirmPassword ? undefined : '비밀번호 확인이 일치하지 않습니다.',
+        draft.password === draft.confirmPassword ? undefined : 'Password confirmation does not match.',
       interests: validateInterests(draft.interests) ?? undefined,
     }
 
@@ -111,7 +111,7 @@ export function RegisterForm() {
     if (!response.ok) {
       const errorResponse = (await response.json().catch(() => null)) as RegisterErrorResponse | null
       setFieldErrors(errorResponse?.fieldErrors ?? {})
-      setSubmitError(errorResponse?.message ?? '회원가입 처리 중 오류가 발생했습니다.')
+      setSubmitError(errorResponse?.message ?? 'An error occurred during registration.')
       setIsSubmitting(false)
       return
     }
@@ -143,131 +143,124 @@ export function RegisterForm() {
   }
 
   return (
-    <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='username' className='text-sm font-medium text-foreground'>
-          유저네임
-        </label>
-        <input
-          id='username'
-          type='text'
-          value={draft.username}
-          onChange={(event) => {
-            const nextDraft = { ...draft, username: event.target.value }
-            updateDraft(nextDraft)
-            setFieldErrors((current) => ({ ...current, username: undefined }))
-          }}
-          className='rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-accent focus:bg-surface'
-          placeholder='reddit_user'
-          autoComplete='username'
-        />
-        {fieldErrors.username ? (
-          <p className='text-sm text-danger'>{fieldErrors.username}</p>
-        ) : null}
+    <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
+      <div className='grid gap-6 md:grid-cols-2'>
+        <div className='space-y-2'>
+          <label className='text-sm font-medium text-slate-300 ml-1'>Traveler Name</label>
+          <div className='relative'>
+            <span className='material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500'>person</span>
+            <input
+              type='text'
+              value={draft.username}
+              onChange={(event) => {
+                const nextDraft = { ...draft, username: event.target.value }
+                updateDraft(nextDraft)
+                setFieldErrors((current) => ({ ...current, username: undefined }))
+              }}
+              className='w-full bg-background/50 border border-slate-700/50 rounded-lg py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all outline-none placeholder:text-slate-600'
+              placeholder='e.g. Dorothy Gale'
+              autoComplete='username'
+            />
+          </div>
+          {fieldErrors.username && <p className='text-xs text-danger ml-1'>{fieldErrors.username}</p>}
+        </div>
+
+        <div className='space-y-2'>
+          <label className='text-sm font-medium text-slate-300 ml-1'>Nickname</label>
+          <div className='relative'>
+            <span className='material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500'>badge</span>
+            <input
+              type='text'
+              value={draft.nickname}
+              onChange={(event) => {
+                const nextDraft = { ...draft, nickname: event.target.value }
+                updateDraft(nextDraft)
+                setFieldErrors((current) => ({ ...current, nickname: undefined }))
+              }}
+              className='w-full bg-background/50 border border-slate-700/50 rounded-lg py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all outline-none placeholder:text-slate-600'
+              placeholder='Display name'
+              autoComplete='nickname'
+            />
+          </div>
+          {fieldErrors.nickname && <p className='text-xs text-danger ml-1'>{fieldErrors.nickname}</p>}
+        </div>
       </div>
 
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='nickname' className='text-sm font-medium text-foreground'>
-          닉네임
-        </label>
-        <input
-          id='nickname'
-          type='text'
-          value={draft.nickname}
-          onChange={(event) => {
-            const nextDraft = { ...draft, nickname: event.target.value }
-            updateDraft(nextDraft)
-            setFieldErrors((current) => ({ ...current, nickname: undefined }))
-          }}
-          className='rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-accent focus:bg-surface'
-          placeholder='커뮤니티에서 표시될 이름'
-          autoComplete='nickname'
-        />
-        {fieldErrors.nickname ? (
-          <p className='text-sm text-danger'>{fieldErrors.nickname}</p>
-        ) : null}
+      <div className='space-y-2'>
+        <label className='text-sm font-medium text-slate-300 ml-1'>Magic Scroll (Email)</label>
+        <div className='relative'>
+          <span className='material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500'>mail</span>
+          <input
+            type='email'
+            value={draft.email}
+            onChange={(event) => {
+              const nextDraft = { ...draft, email: event.target.value }
+              updateDraft(nextDraft)
+              setFieldErrors((current) => ({ ...current, email: undefined }))
+            }}
+            className='w-full bg-background/50 border border-slate-700/50 rounded-lg py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all outline-none placeholder:text-slate-600'
+            placeholder='name@emeraldcity.com'
+            autoComplete='email'
+          />
+        </div>
+        {fieldErrors.email && <p className='text-xs text-danger ml-1'>{fieldErrors.email}</p>}
       </div>
 
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='email' className='text-sm font-medium text-foreground'>
-          이메일
-        </label>
-        <input
-          id='email'
-          type='email'
-          value={draft.email}
-          onChange={(event) => {
-            const nextDraft = { ...draft, email: event.target.value }
-            updateDraft(nextDraft)
-            setFieldErrors((current) => ({ ...current, email: undefined }))
-          }}
-          className='rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-accent focus:bg-surface'
-          placeholder='you@example.com'
-          autoComplete='email'
-        />
-        {fieldErrors.email ? (
-          <p className='text-sm text-danger'>{fieldErrors.email}</p>
-        ) : null}
+      <div className='grid gap-6 md:grid-cols-2'>
+        <div className='space-y-2'>
+          <label className='text-sm font-medium text-slate-300 ml-1'>Secret Spell (Password)</label>
+          <div className='relative'>
+            <span className='material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500'>lock</span>
+            <input
+              type='password'
+              value={draft.password}
+              onChange={(event) => {
+                const nextDraft = { ...draft, password: event.target.value }
+                updateDraft(nextDraft)
+                setFieldErrors((current) => ({ ...current, password: undefined }))
+              }}
+              className='w-full bg-background/50 border border-slate-700/50 rounded-lg py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all outline-none placeholder:text-slate-600'
+              placeholder='Enter your incantation'
+              autoComplete='new-password'
+            />
+          </div>
+          {fieldErrors.password && <p className='text-xs text-danger ml-1'>{fieldErrors.password}</p>}
+        </div>
+
+        <div className='space-y-2'>
+          <label className='text-sm font-medium text-slate-300 ml-1'>Confirm Spell</label>
+          <div className='relative'>
+            <span className='material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500'>key</span>
+            <input
+              type='password'
+              value={draft.confirmPassword}
+              onChange={(event) => {
+                const nextDraft = { ...draft, confirmPassword: event.target.value }
+                updateDraft(nextDraft)
+                setFieldErrors((current) => ({ ...current, confirmPassword: undefined }))
+              }}
+              className='w-full bg-background/50 border border-slate-700/50 rounded-lg py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-accent focus:border-transparent transition-all outline-none placeholder:text-slate-600'
+              placeholder='Confirm spell'
+              autoComplete='new-password'
+            />
+          </div>
+          {fieldErrors.confirmPassword && <p className='text-xs text-danger ml-1'>{fieldErrors.confirmPassword}</p>}
+        </div>
       </div>
 
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='password' className='text-sm font-medium text-foreground'>
-          비밀번호
-        </label>
-        <input
-          id='password'
-          type='password'
-          value={draft.password}
-          onChange={(event) => {
-            const nextDraft = { ...draft, password: event.target.value }
-            updateDraft(nextDraft)
-            setFieldErrors((current) => ({ ...current, password: undefined }))
-          }}
-          className='rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-accent focus:bg-surface'
-          placeholder='8자 이상 입력하세요'
-          autoComplete='new-password'
-        />
-        {fieldErrors.password ? (
-          <p className='text-sm text-danger'>{fieldErrors.password}</p>
-        ) : null}
-      </div>
-
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='confirmPassword' className='text-sm font-medium text-foreground'>
-          비밀번호 확인
-        </label>
-        <input
-          id='confirmPassword'
-          type='password'
-          value={draft.confirmPassword}
-          onChange={(event) => {
-            const nextDraft = { ...draft, confirmPassword: event.target.value }
-            updateDraft(nextDraft)
-            setFieldErrors((current) => ({ ...current, confirmPassword: undefined }))
-          }}
-          className='rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-accent focus:bg-surface'
-          placeholder='비밀번호를 한 번 더 입력하세요'
-          autoComplete='new-password'
-        />
-        {fieldErrors.confirmPassword ? (
-          <p className='text-sm text-danger'>{fieldErrors.confirmPassword}</p>
-        ) : null}
-      </div>
-
-      <div className='rounded-3xl border border-border bg-surface-strong p-4'>
-        <div className='flex items-start justify-between gap-4'>
+      {/* Interests Trigger */}
+      <div className='bg-accent/5 border border-accent/10 rounded-xl p-5'>
+        <div className='flex items-center justify-between gap-4'>
           <div>
-            <p className='text-sm font-medium text-foreground'>관심사</p>
-            <p className='mt-1 text-sm leading-6 text-muted'>
-              관심 커뮤니티를 빠르게 추천할 수 있도록 관심사를 선택하세요.
-            </p>
+            <p className='text-sm font-bold text-slate-200'>Select your Interests</p>
+            <p className='text-xs text-slate-500 mt-1'>Choose your magical paths in Oz.</p>
           </div>
           <button
             type='button'
             onClick={handleInterestPageOpen}
-            className='rounded-full border border-accent px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent hover:text-white'
+            className='px-4 py-2 rounded-full border border-accent/40 bg-accent/10 text-accent text-xs font-bold hover:bg-accent hover:text-white transition-all'
           >
-            관심사 선택하기
+            {draft.interests.length > 0 ? 'Change Path' : 'Select Path'}
           </button>
         </div>
 
@@ -276,29 +269,27 @@ export function RegisterForm() {
             draft.interests.map((interest) => (
               <span
                 key={interest}
-                className='rounded-full bg-highlight-soft px-3 py-1 text-sm font-medium text-deep'
+                className='rounded-full bg-accent/20 border border-accent/20 px-3 py-1 text-xs font-medium text-accent'
               >
                 {interest}
               </span>
             ))
           ) : (
-            <span className='text-sm text-muted'>아직 선택한 관심사가 없습니다.</span>
+            <span className='text-xs text-slate-500'>No paths selected yet.</span>
           )}
         </div>
-
-        {fieldErrors.interests ? (
-          <p className='mt-3 text-sm text-danger'>{fieldErrors.interests}</p>
-        ) : null}
+        {fieldErrors.interests && <p className='mt-2 text-xs text-danger'>{fieldErrors.interests}</p>}
       </div>
 
-      {submitError ? <p className='text-sm text-danger'>{submitError}</p> : null}
+      {submitError && <p className='text-sm text-danger text-center'>{submitError}</p>}
 
       <button
         type='submit'
         disabled={isSubmitting}
-        className='rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.22)] transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60'
+        className='cta-gradient w-full py-4 rounded-lg text-white font-bold text-lg shadow-xl hover:opacity-90 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed'
       >
-        {isSubmitting ? '가입 중...' : '회원가입'}
+        <span>{isSubmitting ? 'Casting Spell...' : 'Begin Your Journey'}</span>
+        {!isSubmitting && <span className='material-symbols-outlined'>east</span>}
       </button>
     </form>
   )

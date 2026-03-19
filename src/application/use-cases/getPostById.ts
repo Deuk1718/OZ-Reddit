@@ -7,6 +7,7 @@ import { PostNotFoundError } from './postErrors'
 
 type GetPostByIdDependencies = {
   postRepository: PostRepository
+  viewerUserId?: string
 }
 
 export async function getPostById(
@@ -17,7 +18,7 @@ export async function getPostById(
     throw new PostNotFoundError('게시글을 찾을 수 없습니다.')
   }
 
-  const post = await dependencies.postRepository.findById(id)
+  const post = await dependencies.postRepository.findById(id, dependencies.viewerUserId)
 
   if (!post) {
     throw new PostNotFoundError('게시글을 찾을 수 없습니다.')

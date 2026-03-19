@@ -10,6 +10,6 @@ export type CreateCommentInput = {
 export interface CommentRepository {
   create(input: CreateCommentInput): Promise<Comment>
   findById(id: string): Promise<Comment | null>
-  getByPostId(postId: string): Promise<Comment[]>
+  getByPostId(postId: string, viewerUserId?: string): Promise<Comment[]>
   delete(id: string): Promise<void>
 }

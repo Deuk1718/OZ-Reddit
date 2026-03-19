@@ -32,26 +32,27 @@ export default async function SubmitPostPage({ params }: SubmitPostPageProps) {
   }
 
   return (
-    <div className='flex w-full flex-col gap-8 pb-8'>
-      <section className='grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_360px]'>
-        <div className='rounded-[2rem] border border-border bg-surface px-6 py-7 shadow-[0_22px_70px_rgba(40,13,140,0.12)] sm:px-8'>
+    <div className='mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6'>
+      <section className='grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_340px]'>
+        <div className='glass-card px-6 py-7 sm:px-8'>
           <Link
             href={`/r/${name}`}
-            className='inline-flex text-sm font-semibold text-accent transition hover:text-accent-strong'
+            className='inline-flex items-center gap-1 text-sm font-semibold text-accent transition hover:text-secondary'
           >
-            ← r/{name} 피드로 돌아가기
+            <span className='material-symbols-outlined text-[16px]'>arrow_back</span>
+            z/{name} 피드로 돌아가기
           </Link>
 
           <div className='mt-6'>
-            <p className='inline-flex rounded-full border border-accent/20 bg-accent-soft px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-accent-strong'>
+            <p className='inline-flex rounded-full bg-accent-soft px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-accent'>
               Create Post
             </p>
-            <h1 className='mt-6 font-display text-5xl tracking-[-0.05em] text-deep'>
-              r/{name}에 새 글 쓰기
+            <h1 className='mt-6 text-3xl font-bold tracking-tight text-deep sm:text-4xl'>
+              z/{name}에 새 글 쓰기
             </h1>
             <p className='mt-4 max-w-2xl text-sm leading-7 text-muted sm:text-base'>
               {community.description} 이 커뮤니티에 맞는 질문, 회고, 인사이트를
-              작성해 보세요. 현재는 실제 저장 로직과 유효성 검증이 연결된 상태입니다.
+              작성해 보세요.
             </p>
           </div>
 
@@ -61,21 +62,21 @@ export default async function SubmitPostPage({ params }: SubmitPostPageProps) {
               <div className='mt-4'>
                 <Link
                   href={`/r/${name}`}
-                  className='rounded-full border border-border bg-surface-strong px-5 py-3 text-sm font-semibold text-deep transition hover:border-accent hover:text-accent'
+                  className='rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground transition hover:border-accent hover:text-accent'
                 >
                   초안 취소
                 </Link>
               </div>
             </>
           ) : (
-            <div className='mt-8 rounded-[1.7rem] border border-border bg-surface-strong px-5 py-5'>
+            <div className='glass-card-strong mt-8 px-5 py-5'>
               <p className='text-sm font-semibold text-deep'>게시글 작성은 로그인 후 가능합니다.</p>
               <p className='mt-3 text-sm leading-7 text-muted'>
                 계정에 로그인한 뒤 이 커뮤니티에 바로 글을 남길 수 있습니다.
               </p>
               <Link
                 href={`/login?callbackUrl=/r/${name}/submit`}
-                className='mt-5 inline-flex rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.24)] transition hover:bg-accent-strong'
+                className='btn-gradient mt-5 inline-flex px-5 py-3 text-sm'
               >
                 로그인하고 작성하기
               </Link>
@@ -84,18 +85,18 @@ export default async function SubmitPostPage({ params }: SubmitPostPageProps) {
         </div>
 
         <aside className='flex flex-col gap-6'>
-          <div className='rounded-[2rem] border border-border bg-deep px-6 py-6 text-white shadow-[0_24px_60px_rgba(40,13,140,0.2)]'>
-            <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-highlight'>
+          <div className='glass-card px-6 py-6'>
+            <p className='text-[11px] font-semibold uppercase tracking-widest text-secondary'>
               Writing Guide
             </p>
-            <h2 className='mt-4 font-display text-3xl tracking-[-0.04em]'>
+            <h2 className='mt-4 text-2xl font-bold tracking-tight text-deep'>
               잘 읽히는 글의 구조
             </h2>
-            <ul className='mt-6 space-y-3 text-sm leading-7 text-white/72'>
+            <ul className='mt-6 space-y-3 text-sm leading-7 text-muted'>
               {writingGuides.map((guide) => (
                 <li
                   key={guide}
-                  className='rounded-[1.2rem] border border-white/10 bg-white/6 px-4 py-3'
+                  className='glass-card-strong px-4 py-3'
                 >
                   {guide}
                 </li>
@@ -103,25 +104,20 @@ export default async function SubmitPostPage({ params }: SubmitPostPageProps) {
             </ul>
           </div>
 
-          <div className='rounded-[2rem] border border-border bg-surface px-6 py-6'>
-            <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-accent'>
+          <div className='glass-card px-6 py-6'>
+            <p className='text-[11px] font-semibold uppercase tracking-widest text-accent'>
               Flow Note
             </p>
             <ul className='mt-4 space-y-3 text-sm leading-7 text-muted'>
-              <li>피드에서 작성 페이지로 진입</li>
-              <li>작성 후 피드 카드 또는 상세 페이지로 연결</li>
-              <li>M03에서 실제 저장 성공 시 상세 페이지 이동 처리 예정</li>
+              <li className='flex items-center gap-2'>
+                <span className='material-symbols-outlined text-[14px] text-accent'>chevron_right</span>
+                피드에서 작성 페이지로 진입
+              </li>
+              <li className='flex items-center gap-2'>
+                <span className='material-symbols-outlined text-[14px] text-accent'>chevron_right</span>
+                작성 후 상세 페이지로 이동
+              </li>
             </ul>
-          </div>
-
-          <div className='rounded-[2rem] border border-border bg-[linear-gradient(180deg,rgba(236,242,48,0.22),rgba(255,255,255,0.96))] px-6 py-6'>
-            <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-accent-strong'>
-              Next Step
-            </p>
-            <p className='mt-4 text-sm leading-7 text-deep'>
-              다음에는 이 페이지에 실제 유효성 검증과 저장 API를 붙여 M03 작성 플로우를
-              완성하면 됩니다.
-            </p>
           </div>
         </aside>
       </section>

@@ -72,8 +72,8 @@ export function CreateSubredditForm() {
         <label htmlFor='subreddit-name' className='text-sm font-medium text-foreground'>
           서브레딧 이름
         </label>
-        <div className='flex items-center rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground transition focus-within:border-accent focus-within:bg-surface'>
-          <span className='mr-2 text-muted'>r/</span>
+        <div className='glass-input flex items-center px-4 py-3 text-sm'>
+          <span className='mr-2 text-muted'>z/</span>
           <input
             id='subreddit-name'
             type='text'
@@ -82,7 +82,7 @@ export function CreateSubredditForm() {
               setName(event.target.value)
               setFieldErrors((current) => ({ ...current, name: undefined }))
             }}
-            className='w-full bg-transparent outline-none'
+            className='w-full bg-transparent text-foreground outline-none placeholder:text-muted'
             placeholder='community_name'
             autoComplete='off'
           />
@@ -102,7 +102,8 @@ export function CreateSubredditForm() {
             setDescription(event.target.value)
             setFieldErrors((current) => ({ ...current, description: undefined }))
           }}
-          className='rounded-[1.5rem] border border-border bg-background px-4 py-4 text-sm leading-7 text-foreground outline-none transition focus:border-accent focus:bg-surface'
+          className='glass-input px-4 py-4 text-sm leading-7'
+          style={{ borderRadius: '1.5rem' }}
           placeholder='이 커뮤니티에서 어떤 대화를 나누게 될지 짧게 설명해 주세요.'
         />
         {fieldErrors.description ? (
@@ -117,7 +118,7 @@ export function CreateSubredditForm() {
       <button
         type='submit'
         disabled={isSubmitting}
-        className='rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.24)] transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60'
+        className='btn-gradient px-5 py-3 text-sm'
       >
         {isSubmitting ? '생성 중...' : '서브레딧 만들기'}
       </button>

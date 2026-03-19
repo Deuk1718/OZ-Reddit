@@ -7,6 +7,7 @@ import { getPostById } from '@/application/use-cases/getPostById'
 import { CommentComposer } from '@/components/comments/CommentComposer'
 import { CommentThreadList } from '@/components/comments/CommentThreadList'
 import { DeletePostButton } from '@/components/feed/DeletePostButton'
+import { VoteButton } from '@/components/feed/VoteButton'
 import { authOptions } from '@/infrastructure/auth/authOptions'
 import { PrismaCommentRepository } from '@/infrastructure/db/repositories/PrismaCommentRepository'
 import { PrismaPostRepository } from '@/infrastructure/db/repositories/PrismaPostRepository'
@@ -24,11 +25,15 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
   const session = await getServerSession(authOptions)
   const postRepository = new PrismaPostRepository()
   const commentRepository = new PrismaCommentRepository()
-  const post = await getPostById(postId, { postRepository }).catch(() => null)
+  const post = await getPostById(postId, {
+    postRepository,
+    viewerUserId: session?.user?.id,
+  }).catch(() => null)
   const comments = post
     ? await getComments(
         {
           postId: post.id,
+          viewerUserId: session?.user?.id,
         },
         { commentRepository, postRepository }
       ).catch(() => [])
@@ -39,167 +44,154 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
   }
 
   return (
-    <div className='flex w-full flex-col gap-8 pb-8'>
-      <section className='grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]'>
-        <article className='rounded-[2rem] border border-border bg-surface px-6 py-7 shadow-[0_22px_70px_rgba(40,13,140,0.12)] sm:px-8'>
-          <Link
-            href={`/r/${name}`}
-            className='inline-flex text-sm font-semibold text-accent transition hover:text-accent-strong'
-          >
-            ← r/{name}로 돌아가기
-          </Link>
+    <main className='max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8'>
+      {/* Left Sidebar: Interaction (Desktop) */}
+      <div className='hidden lg:flex lg:col-span-1 flex-col items-center gap-6 py-4'>
+        <div className='flex flex-col items-center gap-2 bg-background/50 p-2 rounded-full border border-accent/10'>
+          <button className='w-10 h-10 rounded-full hover:bg-accent/20 hover:text-secondary flex items-center justify-center transition-all'>
+            <span className='material-symbols-outlined'>expand_less</span>
+          </button>
+          <span className='text-xs font-bold'>{post.score >= 1000 ? `${(post.score / 1000).toFixed(1)}k` : post.score}</span>
+          <button className='w-10 h-10 rounded-full hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition-all'>
+            <span className='material-symbols-outlined'>expand_more</span>
+          </button>
+        </div>
+        <button className='w-10 h-10 rounded-full bg-background border border-accent/10 flex items-center justify-center hover:bg-accent/20 group'>
+          <span className='material-symbols-outlined text-slate-400 group-hover:text-accent transition-colors'>share</span>
+        </button>
+        <button className='w-10 h-10 rounded-full bg-background border border-accent/10 flex items-center justify-center hover:bg-accent/20 group'>
+          <span className='material-symbols-outlined text-slate-400 group-hover:text-accent transition-colors'>bookmark</span>
+        </button>
+        {session?.user?.id === post.authorId && (
+          <DeletePostButton postId={post.id} subredditName={post.subredditName} />
+        )}
+      </div>
 
-          <div className='mt-6 flex flex-wrap items-center gap-2'>
-            <span className='rounded-full bg-highlight-soft px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-deep'>
-              Post Detail
-            </span>
-            <span className='rounded-full border border-accent/14 bg-accent-soft px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-strong'>
-              r/{post.subredditName}
-            </span>
-          </div>
-
-          <h1 className='mt-5 max-w-4xl font-display text-5xl tracking-[-0.05em] text-deep'>
-            {post.title}
-          </h1>
-
-          <div className='mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted'>
-            <span className='font-medium text-foreground'>u/{post.authorUsername ?? 'unknown'}</span>
-            <span>{formatRelativeTime(post.createdAt)}</span>
-            <span>{post.commentCount} comments</span>
-          </div>
-
-          <div className='mt-8 grid gap-6 md:grid-cols-[72px_minmax(0,1fr)]'>
-            <div className='flex flex-row items-center gap-3 md:flex-col md:items-center'>
-              <button
-                type='button'
-                className='inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface-strong text-sm font-semibold text-muted transition hover:border-accent hover:text-accent'
-                aria-label='추천'
-              >
-                ▲
-              </button>
-              <div className='text-center'>
-                <p className='text-xl font-semibold tracking-tight text-deep'>{post.score}</p>
-                <p className='text-[11px] uppercase tracking-[0.2em] text-muted'>score</p>
+      {/* Main Content Column */}
+      <div className='lg:col-span-8 flex flex-col gap-6'>
+        {/* Post Content */}
+        <article className='glass-card rounded-xl overflow-hidden glowing-border'>
+          <div className='p-6'>
+            <div className='flex items-center gap-3 mb-6'>
+              <div className='w-12 h-12 rounded-full bg-gradient-to-tr from-accent to-secondary p-[2px]'>
+                <div className='w-full h-full rounded-full bg-background flex items-center justify-center'>
+                  <span className='material-symbols-outlined text-secondary'>auto_fix_high</span>
+                </div>
               </div>
-              <button
-                type='button'
-                className='inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface-strong text-sm font-semibold text-muted transition hover:border-accent hover:text-accent'
-                aria-label='비추천'
-              >
-                ▼
-              </button>
+              <div>
+                <div className='flex items-center gap-2'>
+                  <h3 className='font-bold text-slate-100'>u/{post.authorUsername ?? 'unknown'}</h3>
+                  <span className='bg-accent/20 text-accent text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider'>Traveler</span>
+                </div>
+                <p className='text-xs text-slate-400'>Posted in <span className='text-secondary'>z/{post.subredditName}</span> • {formatRelativeTime(post.createdAt)}</p>
+              </div>
             </div>
 
-            <div className='rounded-[1.7rem] border border-border bg-surface-strong px-5 py-5'>
-              <p className='text-base leading-8 text-foreground'>
-                {post.body ?? '본문이 없는 텍스트 게시글입니다.'}
-              </p>
+            <h1 className='text-3xl md:text-4xl font-bold mb-6 leading-tight text-slate-100'>
+              {post.title}
+            </h1>
 
-              <div className='mt-8 flex flex-wrap gap-3'>
-                <a
-                  href='#comment-preview'
-                  className='rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.22)] transition hover:bg-accent-strong'
-                >
-                  댓글 영역 보기
-                </a>
-                <button
-                  type='button'
-                  className='rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-deep transition hover:border-accent hover:text-accent'
-                >
-                  게시글 공유
-                </button>
-                {session?.user?.id === post.authorId ? (
-                  <DeletePostButton postId={post.id} subredditName={post.subredditName} />
-                ) : null}
-              </div>
+            <div className='prose-oz max-w-none text-slate-300 whitespace-pre-wrap'>
+              {post.body}
+            </div>
+
+            <div className='mt-10 pt-6 border-t border-accent/10 flex flex-wrap gap-4'>
+              <VoteButton
+                targetType='post'
+                targetId={post.id}
+                initialScore={post.score}
+                initialVote={post.currentUserVote}
+              />
+              <button className='flex items-center gap-2 bg-background hover:bg-accent/20 px-4 py-2 rounded-full border border-accent/10 transition-colors'>
+                <span className='material-symbols-outlined text-sm'>magic_button</span>
+                <span className='text-sm font-medium'>Share the Magic</span>
+              </button>
             </div>
           </div>
         </article>
 
-        <aside className='flex flex-col gap-6'>
-          <div className='rounded-[2rem] border border-border bg-deep px-6 py-6 text-white shadow-[0_24px_60px_rgba(40,13,140,0.2)]'>
-            <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-highlight'>
-              Discussion
-            </p>
-            <h2 className='mt-4 font-display text-3xl tracking-[-0.04em]'>댓글 흐름</h2>
-            <p className='mt-4 text-sm leading-7 text-white/72'>
-              댓글 작성, 답글, 삭제 흐름이 상세 페이지와 연결되었습니다. 한 단계 대댓글까지만
-              허용해 대화 계층을 단순하게 유지합니다.
-            </p>
-            <div className='mt-6 rounded-[1.5rem] border border-white/14 bg-white/8 px-4 py-4'>
-              <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/58'>
-                Comment Rules
-              </p>
-              <p className='mt-3 text-sm leading-7 text-white/80'>
-                최신순 정렬로 표시되며, 대댓글에는 다시 답글을 달 수 없습니다. 삭제는 작성자
-                본인만 가능합니다.
-              </p>
-            </div>
+        {/* Comment Section */}
+        <section className='mt-8 space-y-6'>
+          <h3 className='text-xl font-bold px-2 flex items-center gap-2'>
+            <span className='material-symbols-outlined text-secondary'>forum</span>
+            Arcane Responses ({post.commentCount})
+          </h3>
+
+          <div className='bg-background/50 border border-accent/10 rounded-xl p-4'>
+            {session?.user?.id ? (
+              <CommentComposer
+                postId={post.id}
+                submitLabel='Scribe Comment'
+                placeholder='Write a response to the Archive...'
+              />
+            ) : (
+              <div className='py-4 text-center'>
+                <p className='text-slate-400 text-sm mb-4'>Login to share your wisdom.</p>
+                <Link href='/login' className='bg-accent hover:bg-accent-strong text-white px-6 py-2 rounded-full text-sm font-bold transition-all'>
+                  Login to Oz
+                </Link>
+              </div>
+            )}
           </div>
 
-          <div className='rounded-[2rem] border border-border bg-surface px-6 py-6'>
-            <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-accent'>
-              Meta Panel
-            </p>
-            <ul className='mt-4 space-y-3 text-sm leading-7 text-muted'>
-              <li>서브레딧: r/{post.subredditName}</li>
-              <li>작성자: u/{post.authorUsername ?? 'unknown'}</li>
-              <li>점수: {post.score}</li>
-              <li>댓글 수: {post.commentCount}</li>
-            </ul>
-          </div>
-        </aside>
-      </section>
-
-      <section
-        id='comment-preview'
-        className='rounded-[2rem] border border-border bg-surface px-6 py-7 shadow-[0_18px_48px_rgba(40,13,140,0.1)] sm:px-8'
-      >
-        <div className='flex items-center justify-between gap-4 border-b border-border pb-5'>
-          <div>
-            <p className='text-[11px] font-semibold uppercase tracking-[0.28em] text-accent'>
-              Comment Preview
-            </p>
-            <h2 className='mt-3 font-display text-4xl tracking-[-0.04em] text-deep'>
-              댓글
-            </h2>
-          </div>
-          <span className='rounded-full bg-highlight-soft px-4 py-2 text-sm font-semibold text-deep'>
-            {post.commentCount} threads
-          </span>
-        </div>
-
-        <div className='mt-6 rounded-[1.5rem] border border-border bg-surface-strong px-5 py-5'>
-          {session?.user?.id ? (
-            <CommentComposer
+          <div className='mt-6'>
+            <CommentThreadList
+              comments={comments}
+              currentUserId={session?.user?.id ?? null}
               postId={post.id}
-              submitLabel='댓글 등록'
-              placeholder='이 게시글에 대한 의견을 남겨 보세요'
             />
-          ) : (
-            <div className='flex flex-col gap-3'>
-              <p className='text-sm font-semibold text-deep'>댓글을 남기려면 로그인이 필요합니다.</p>
-              <p className='text-sm leading-7 text-muted'>
-                로그인 후 댓글과 대댓글을 작성할 수 있습니다.
-              </p>
-              <Link
-                href={`/login?callbackUrl=/r/${name}/${post.id}`}
-                className='inline-flex w-fit rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(74,48,242,0.22)] transition hover:bg-accent-strong'
-              >
-                로그인하러 가기
-              </Link>
+          </div>
+        </section>
+      </div>
+
+      {/* Sidebar */}
+      <aside className='lg:col-span-3 flex flex-col gap-6'>
+        {/* Stats Widget */}
+        <div className='glass-card p-5 rounded-xl border border-accent/20'>
+          <h4 className='font-bold text-slate-100 mb-4 flex items-center gap-2 text-sm'>
+            <span className='material-symbols-outlined text-accent text-sm'>analytics</span>
+            Sub-OZ Statistics
+          </h4>
+          <div className='space-y-4 text-sm'>
+            <div className='flex justify-between items-center'>
+              <span className='text-xs text-slate-400'>Sub-OZ</span>
+              <span className='font-bold text-secondary'>z/{post.subredditName}</span>
             </div>
-          )}
+            <div className='flex justify-between items-center'>
+              <span className='text-xs text-slate-400'>Post Score</span>
+              <span className='font-bold'>{post.score}</span>
+            </div>
+            <div className='flex justify-between items-center'>
+              <span className='text-xs text-slate-400'>Comments</span>
+              <span className='font-bold'>{post.commentCount}</span>
+            </div>
+            <button className='w-full py-2 mt-2 bg-accent/20 hover:bg-accent/30 text-accent font-bold text-sm rounded-lg transition-all border border-accent/20'>
+              Join Sub-OZ
+            </button>
+          </div>
         </div>
 
-        <div className='mt-6'>
-          <CommentThreadList
-            comments={comments}
-            currentUserId={session?.user?.id ?? null}
-            postId={post.id}
-          />
+        {/* Related (Stub) */}
+        <div className='glass-card p-5 rounded-xl border border-accent/20'>
+          <h4 className='font-bold text-slate-100 mb-4 flex items-center gap-2 text-sm'>
+            <span className='material-symbols-outlined text-accent text-sm'>auto_stories</span>
+            Other Archives
+          </h4>
+          <div className='space-y-5'>
+            <div className='group block cursor-pointer'>
+              <p className='text-xs text-accent mb-1'>z/{post.subredditName} • Recent</p>
+              <p className='text-sm font-medium group-hover:text-secondary transition-colors'>More magical secrets coming soon...</p>
+            </div>
+          </div>
         </div>
-      </section>
-    </div>
+
+        {/* Footer Small */}
+        <div className='px-2 text-[10px] text-slate-500 flex flex-wrap gap-x-4 gap-y-2 uppercase tracking-widest font-bold'>
+          <a className='hover:text-slate-300' href='#'>Terms of Magic</a>
+          <a className='hover:text-slate-300' href='#'>Archive Policy</a>
+          <span>© 2024 OZ-Reddit</span>
+        </div>
+      </aside>
+    </main>
   )
 }

@@ -6,6 +6,7 @@ export type PostSort = 'hot' | 'new'
 export type GetPostsInput = {
   sort?: string
   subredditName?: string
+  viewerUserId?: string
   cursor?: string
   take?: number
 }
@@ -50,7 +51,10 @@ export async function getPosts(
   const take = input.take ?? DEFAULT_TAKE
   const sort = parseSort(input.sort)
   const offset = parseOffset(input.cursor)
-  const posts = await dependencies.postRepository.getAll(input.subredditName)
+  const posts = await dependencies.postRepository.getAll({
+    subredditName: input.subredditName,
+    viewerUserId: input.viewerUserId,
+  })
   const now = Date.now()
 
   const sortedPosts = [...posts].sort((left, right) => {

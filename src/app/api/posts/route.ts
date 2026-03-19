@@ -22,6 +22,7 @@ function isCreatePostRequestBody(value: unknown): value is CreatePostRequestBody
 }
 
 export async function GET(request: Request) {
+  const session = await getServerSession(authOptions)
   const { searchParams } = new URL(request.url)
   const sort = searchParams.get('sort') ?? undefined
   const subreddit = searchParams.get('subreddit') ?? undefined
@@ -36,6 +37,7 @@ export async function GET(request: Request) {
       subredditName: subreddit,
       cursor,
       take: Number.isNaN(take ?? NaN) ? undefined : take,
+      viewerUserId: session?.user?.id,
     },
     { postRepository }
   )

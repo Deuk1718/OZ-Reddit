@@ -35,8 +35,9 @@ export function FeedPagination({
       {previousCursor ? (
         <Link
           href={`${basePath}?sort=${sort}&cursor=${previousCursor}`}
-          className='rounded-full border border-border bg-surface-strong px-5 py-3 text-sm font-semibold text-deep transition hover:border-accent hover:text-accent'
+          className='glass-card flex items-center gap-2 px-5 py-3 text-sm font-semibold text-foreground transition hover:border-accent hover:text-accent'
         >
+          <span className='material-symbols-outlined text-[18px]'>chevron_left</span>
           이전 페이지
         </Link>
       ) : null}
@@ -44,9 +45,10 @@ export function FeedPagination({
       {nextCursor ? (
         <Link
           href={`${basePath}?sort=${sort}&cursor=${nextCursor}`}
-          className='rounded-full border border-border bg-surface-strong px-5 py-3 text-sm font-semibold text-deep transition hover:border-accent hover:text-accent'
+          className='glass-card flex items-center gap-2 px-5 py-3 text-sm font-semibold text-foreground transition hover:border-accent hover:text-accent'
         >
           다음 페이지
+          <span className='material-symbols-outlined text-[18px]'>chevron_right</span>
         </Link>
       ) : null}
     </div>

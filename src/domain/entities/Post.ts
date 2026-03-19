@@ -1,3 +1,5 @@
+import type { CurrentVoteValue } from '@/domain/entities/Vote'
+
 export type Post = {
   id: string
   title: string
@@ -7,6 +9,7 @@ export type Post = {
   subredditId: string
   subredditName: string
   score: number
+  currentUserVote: CurrentVoteValue
   commentCount: number
   createdAt: Date
   updatedAt: Date
